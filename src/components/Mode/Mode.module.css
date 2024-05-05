@@ -1,0 +1,12 @@
+.mode {
+	padding: 0.5rem 1rem;
+	border-radius: 0.5rem;
+}
+
+.modeWork {
+	background-color: lightgreen;
+}
+
+.modePause {
+	background-color: lightpink;
+}
