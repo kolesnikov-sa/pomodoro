@@ -1,11 +1,13 @@
 import React from 'react';
-import { ThemeType } from '../../App';
+import { ThemeType, IntervalType } from '../../App';
 import styles from './Settings.module.css';
 import Button from '../Button/Button';
 
 type SettingsPropsType = {
-	theme: ThemeType
-	changeTheme: () => void
+	theme: ThemeType,
+	changeTheme: () => void,
+	interval: IntervalType,
+	changeInterval: () => void
 };
 
 class Settings extends React.Component<SettingsPropsType> {
@@ -13,11 +15,12 @@ class Settings extends React.Component<SettingsPropsType> {
 		return (
 			<div className={styles.settings}>
 				<Button
-					text={'light' === this.props.theme ? "\u263E" : "\u2600"}
+					text={'25-5' === this.props.interval ? "50-10" : "25-5"}
+					callback={this.props.changeInterval}
+				/>
+				<Button
+					text={'light' === this.props.theme ? "Dark" : "Light"}
 					callback={this.props.changeTheme}
-					color="#aaa"
-					noBorder={true}
-					fontSize='1.5rem'
 				/>
 			</div>
 		);

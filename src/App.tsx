@@ -14,6 +14,7 @@ type AppPropsType = {};
 
 type ModeType = 'timer' | 'pause';
 export type ThemeType = 'light' | 'dark';
+export type IntervalType = '25-5' | '50-10';
 
 type AppStateType = {
 	startTime: number,
@@ -24,6 +25,9 @@ type AppStateType = {
 	paused: boolean,
 	mode: ModeType,
 	theme: ThemeType,
+	interval: IntervalType,
+	currentTimeDurationSetting: number,
+	currentPauseDurationSetting: number
 }
 
 class App extends React.Component {
@@ -37,6 +41,7 @@ class App extends React.Component {
 		this.stopTimer = this.stopTimer.bind(this);
 		this.nextMode = this.nextMode.bind(this);
 		this.changeTheme = this.changeTheme.bind(this);
+		this.changeInterval = this.changeInterval.bind(this);
 	}
 
 	initialTimeLeft = 25 * 60 * 1000; // 25 minutes
@@ -53,6 +58,9 @@ class App extends React.Component {
 		paused: false,
 		mode: 'timer',
 		theme: 'light',
+		interval: '25-5',
+		currentTimeDurationSetting: this.initialTimeLeft,
+		currentPauseDurationSetting: this.initialPauseLeft,
 	}
 
 	runTimer() {
@@ -84,8 +92,8 @@ class App extends React.Component {
 		this.setState({
 			...this.state,
 			startTime: new Date().getTime(),
-			totalTime: 'timer' === this.state.mode ? this.initialTimeLeft : this.initialPauseLeft,
-			timeLeft: 'timer' === this.state.mode ? this.initialTimeLeft : this.initialPauseLeft,
+			totalTime: 'timer' === this.state.mode ? this.state.currentTimeDurationSetting : this.state.currentPauseDurationSetting,
+			timeLeft: 'timer' === this.state.mode ? this.state.currentTimeDurationSetting : this.state.currentPauseDurationSetting,
 			activeTimerId: activeTimerId,
 			started: true,
 			paused: false
@@ -123,8 +131,8 @@ class App extends React.Component {
 
 		this.setState({
 			...this.state,
-			startTime: 'timer' === this.state.mode ? this.initialTimeLeft : this.initialPauseLeft,
-			timeLeft: 'timer' === this.state.mode ? this.initialTimeLeft : this.initialPauseLeft,
+			startTime: 'timer' === this.state.mode ? this.state.currentTimeDurationSetting : this.state.currentPauseDurationSetting,
+			timeLeft: 'timer' === this.state.mode ? this.state.currentTimeDurationSetting : this.state.currentPauseDurationSetting,
 			started: false,
 			paused: false,
 		});
@@ -139,8 +147,8 @@ class App extends React.Component {
 			this.setState({
 				...this.state,
 				startTime: 0,
-				totalTime: this.initialPauseLeft,
-				timeLeft: this.initialPauseLeft,
+				totalTime: this.state.currentPauseDurationSetting,
+				timeLeft: this.state.currentPauseDurationSetting,
 				activeTimerId: 0,
 				started: false,
 				paused: false,
@@ -150,8 +158,8 @@ class App extends React.Component {
 			this.setState({
 				...this.state,
 				startTime: 0,
-				totalTime: this.initialTimeLeft,
-				timeLeft: this.initialTimeLeft,
+				totalTime: this.state.currentTimeDurationSetting,
+				timeLeft: this.state.currentTimeDurationSetting,
 				activeTimerId: 0,
 				started: false,
 				paused: false,
@@ -164,6 +172,26 @@ class App extends React.Component {
 		this.setState({
 			...this.state,
 			theme: 'light' === this.state.theme ? 'dark' : 'light'
+		});
+	}
+
+	changeInterval() {
+		this.stopTimer();
+		const newInterval = '25-5' === this.state.interval ? '50-10' : '25-5';
+		const [newTimeDurationSetting, newPauseDurationSetting] = '25-5' !== newInterval ? [50, 10] : [25, 5];
+
+		this.setState({
+			...this.state,
+			startTime: 0,
+			totalTime: newTimeDurationSetting * 60 * 1000,
+			timeLeft: newTimeDurationSetting * 60 * 1000,
+			activeTimerId: 0,
+			started: false,
+			paused: false,
+			mode: 'timer',
+			interval: newInterval,
+			currentTimeDurationSetting: newTimeDurationSetting * 60 * 1000,
+			currentPauseDurationSetting: newPauseDurationSetting * 60 * 1000,
 		});
 	}
 
@@ -182,10 +210,15 @@ class App extends React.Component {
 						text={!this.state.started ? "Start" : !this.state.paused ? "Pause" : "Resume"}
 						callback={!this.state.started ? this.startTimer : !this.state.paused ? this.pauseTimer : this.resumeTimer}
 					/>
-					<Button text="Stop" callback={this.state.started ? this.stopTimer : () => {}} disabled={!this.state.started}/>
+					<Button text="Stop" callback={this.state.started ? this.stopTimer : () => { }} disabled={!this.state.started} />
 					<Button text="Skip" callback={this.nextMode} />
 				</div>
-				<Settings theme={this.state.theme} changeTheme={this.changeTheme} />
+				<Settings
+					theme={this.state.theme}
+					changeTheme={this.changeTheme}
+					interval={this.state.interval}
+					changeInterval={this.changeInterval}
+				/>
 			</div>
 		);
 	}
