@@ -3,11 +3,17 @@ import './App.css';
 import Timer from './components/Timer/Timer';
 import ProgressBar from './components/ProgressBar/ProgressBar';
 import Button from './components/Button/Button';
-import convertTimestampToMinutesSeconds from './utils/convertTimestampToMinutesSeconds';
 import Mode from './components/Mode/Mode';
+import Settings from './components/Settings/Settings';
+
+import convertTimestampToMinutesSeconds from './utils/convertTimestampToMinutesSeconds';
+
 import ding from './sounds/ding.mp3';
 
 type AppPropsType = {};
+
+type ModeType = 'timer' | 'pause';
+export type ThemeType = 'light' | 'dark';
 
 type AppStateType = {
 	startTime: number,
@@ -16,7 +22,8 @@ type AppStateType = {
 	activeTimerId: number,
 	started: boolean,
 	paused: boolean,
-	mode: 'timer' | 'pause'
+	mode: ModeType,
+	theme: ThemeType,
 }
 
 class App extends React.Component {
@@ -29,6 +36,7 @@ class App extends React.Component {
 		this.resumeTimer = this.resumeTimer.bind(this);
 		this.stopTimer = this.stopTimer.bind(this);
 		this.nextMode = this.nextMode.bind(this);
+		this.changeTheme = this.changeTheme.bind(this);
 	}
 
 	initialTimeLeft = 25 * 60 * 1000; // 25 minutes
@@ -43,7 +51,8 @@ class App extends React.Component {
 		activeTimerId: 0,
 		started: false,
 		paused: false,
-		mode: 'timer'
+		mode: 'timer',
+		theme: 'light',
 	}
 
 	runTimer() {
@@ -128,6 +137,7 @@ class App extends React.Component {
 
 		if ('timer' === this.state.mode) {
 			this.setState({
+				...this.state,
 				startTime: 0,
 				totalTime: this.initialPauseLeft,
 				timeLeft: this.initialPauseLeft,
@@ -138,6 +148,7 @@ class App extends React.Component {
 			});
 		} else {
 			this.setState({
+				...this.state,
 				startTime: 0,
 				totalTime: this.initialTimeLeft,
 				timeLeft: this.initialTimeLeft,
@@ -149,9 +160,16 @@ class App extends React.Component {
 		}
 	}
 
+	changeTheme() {
+		this.setState({
+			...this.state,
+			theme: 'light' === this.state.theme ? 'dark' : 'light'
+		});
+	}
+
 	render() {
 		return (
-			<div className="App">
+			<div className={`${"App"}${'light' !== this.state.theme ? ' dark' : ''}`}>
 				<Mode mode={this.state.mode} />
 				<Timer timeLeft={this.state.timeLeft} />
 				<ProgressBar
@@ -167,6 +185,7 @@ class App extends React.Component {
 					<Button text="Stop" callback={this.state.started ? this.stopTimer : () => {}} disabled={!this.state.started}/>
 					<Button text="Skip" callback={this.nextMode} />
 				</div>
+				<Settings theme={this.state.theme} changeTheme={this.changeTheme} />
 			</div>
 		);
 	}
