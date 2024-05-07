@@ -1,8 +1,11 @@
 .button {
 	padding: 1rem;
-	border: 2px gainsboro solid;
 	border-radius: 0.5rem;
 	cursor: pointer;
+}
+
+.button:not(.noBorder) {
+	border: 2px gainsboro solid;
 }
 
 .disabled {
